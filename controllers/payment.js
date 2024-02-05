@@ -45,6 +45,8 @@ const cashOut = async (req, res) => {
   }
 };
 
+
+
 const checkBalance = async (req, res) => {
   try{
     const response = await paypack.me();
@@ -54,4 +56,35 @@ const checkBalance = async (req, res) => {
   }
 }
 
-module.exports = { requestPayment, cashOut, checkBalance}
+
+const callback = async (req, res) => {
+  const requestHash = req.get('X-Paypack-Signature');
+  const secret = process.env.PAYPACK_WEBHOOK_SIGN_KEY;
+
+  // Validate webhook authenticity
+  const hash = crypto.createHmac('sha256', secret).update(req.rawBody).digest('base64');
+  if (hash === requestHash || req.method !== "HEAD") {
+    // Webhook is valid, process the payload
+    handlePaypackWebhook(req.body);
+    res.status(200).send('Webhook Received');
+  } else {
+    // Invalid webhook, reject
+    res.status(403).send('Invalid Webhook Signature');
+  }
+}
+
+function handlePaypackWebhook(payload) {
+  // Implement logic to process the webhook payload
+  // Update your application state based on the payment status
+  const paymentStatus = payload.status;
+
+  if (paymentStatus === 'success') {
+    // Payment was successful, implement your logic here
+    console.log('Payment successful:', payload);
+  } else {
+    // Payment failed, implement your logic here
+    console.log('Payment failed:', payload);
+  }
+}
+
+module.exports = { requestPayment, cashOut, checkBalance, callback}

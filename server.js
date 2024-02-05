@@ -6,16 +6,18 @@ const app = express();
 const userRouter = require('./routes/userRoute');
 const mongoose = require('mongoose');
 const paymentRouter = require("./routes/payment");
-const postsRouter = require("./routes/postsRouter")
+const postsRouter = require("./routes/postsRouter");
+const morgan = require('morgan');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
+app.use(morgan('dev'));
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log('db connected'))
 .catch(err => console.log(err));
 
 app.get('/', (req, res) => {
-    res.sendStatus(404);
+    res.status(200).json({ status: 'success', message: "welcome to my api"});
 })
 
 app.use('/', userRouter);
