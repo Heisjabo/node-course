@@ -1,5 +1,6 @@
 const PaypackJs = require("paypack-js").default;
 require('dotenv').config();
+const crypto = require('crypto');
 
 const paypack = new PaypackJs({ client_id: process.env.client_id, client_secret: process.env.client_secret });
 
